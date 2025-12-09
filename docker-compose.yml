@@ -1,0 +1,52 @@
+version: "3.9"
+
+services:
+  spring:
+    image: heloara/spring-videolocadora
+    container_name: spring
+    ports:
+      - "8080:8080"
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: videoLocadora
+      DB_USER: postgres
+      DB_PASSWORD: 122760
+    depends_on:
+      - postgres
+    networks:
+      - app-net
+
+  vue:
+    image: heloara/vue-videolocadora
+    container_name: vue
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_URL: "http://spring:8080"
+    depends_on:
+      - spring
+    networks:
+      - app-net
+
+  postgres:
+    image: postgres:16
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_DB: videoLocadora
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 122760
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-net
+
+networks:
+  app-net:
+    driver: bridge
+
+volumes:
+  postgres_data:
